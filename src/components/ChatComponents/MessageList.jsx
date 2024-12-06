@@ -6,23 +6,20 @@ const MessageList = ({ messages, user }) => {
   const messageEndRef = useRef(null);
   const [usernames, setUsernames] = useState({});
 
-  if (!Array.isArray(messages)) {
-    console.error("Expected messages to be an array but got:", messages);
-    return <div>Impossible de charger les messages.</div>;
-  }
-
-  const filteredMessages = messages.filter(
-    (msg, index, self) =>
+  const uniqueMessages = messages.filter((msg, index, self) => {
+    return (
       index ===
       self.findIndex(
         (m) =>
           m.content === msg.content &&
           m.senderId === msg.senderId &&
-          m.recipientId === msg.recipientId
+          m.recipientId === msg.recipientId &&
+          dayjs(m.createdAt).isSame(msg.createdAt, "second")
       )
-  );
+    );
+  });
 
-  const sortedMessages = [...filteredMessages].sort(
+  const sortedMessages = [...uniqueMessages].sort(
     (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
   );
 
@@ -47,7 +44,10 @@ const MessageList = ({ messages, user }) => {
             const userData = await AuthService.getUserById(senderId, token);
             newUsernames[senderId] = userData.username;
           } catch (error) {
-            console.error(`Erreur lors de la récupération de l'utilisateur ${senderId}:`, error);
+            console.error(
+              `Erreur lors de la récupération de l'utilisateur ${senderId}:`,
+              error
+            );
           }
         }
       });
@@ -72,7 +72,7 @@ const MessageList = ({ messages, user }) => {
         const showDateSeparator = currentMessageDate !== previousMessageDate;
 
         return (
-          <React.Fragment key={`${msg._id}-${index}`}>
+          <React.Fragment key={`${msg._id || msg.createdAt}-${index}`}>
             {showDateSeparator && (
               <div className="text-center text-gray-500 text-sm mb-2">
                 {currentMessageDate}
@@ -80,14 +80,14 @@ const MessageList = ({ messages, user }) => {
             )}
             <div
               className={`flex ${
-                msg.senderId === user.id ? "justify-start" : "justify-end"
+                msg.senderId === user.id ? "justify-end" : "justify-start"
               }`}
             >
               <div
                 className={`p-3 rounded-lg max-w-xs ${
                   msg.senderId === user.id
-                    ? "bg-blue-100 text-left"
-                    : "bg-green-100 text-right"
+                    ? "bg-blue-100 text-right"
+                    : "bg-green-100 text-left"
                 }`}
               >
                 <p>{msg.content}</p>

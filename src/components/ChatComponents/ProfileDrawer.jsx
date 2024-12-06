@@ -50,7 +50,7 @@ const ProfileDrawer = ({
             className="w-20 h-20 rounded-full border-2 border-green-500"
           />
           <div className="ml-4">
-            <h2 className="text-sm font-bold">{username}</h2>
+            <h2 className="text-sm font-bold text-gray-700">{username}</h2>
             <p className="text-sm text-gray-500">{email || "Email non fourni"}</p>
           </div>
         </div>

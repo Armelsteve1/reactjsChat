@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Importer useNavigate pour la navigation
 import { useUser } from "../../Context/UserContext";
 import ProfileDrawer from "./ProfileDrawer";
 import axios from "axios";
 import { io } from "socket.io-client";
 
 const socket = io("http://localhost:3000");
+socket.on("connect_error", (error) => {
+  console.error("Erreur de connexion WebSocket :", error);
+});
 
 const Sidebar = ({ onUserClick }) => {
-  const { user, setUser } = useUser();
+  const { user, setUser, clearUser } = useUser(); // Ajouter clearUser si non inclus
+  const navigate = useNavigate(); // Utiliser pour rediriger
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,13 +43,10 @@ const Sidebar = ({ onUserClick }) => {
         updatedUser,
         {
           headers: {
-            Authorization: `Bearer ${user?.token}`,
-          },
+            Authorization: `Bearer ${user?.token}` },
         }
       );
-
       const updatedData = response.data;
-
       setUser((prev) => ({
         ...prev,
         username: updatedData.username,
@@ -55,39 +57,42 @@ const Sidebar = ({ onUserClick }) => {
       console.error("Erreur lors de la mise à jour de l'utilisateur :", error);
     }
   };
-  // const handleLogout = async () => {
-  //   try {
-  //     await axios.post(
-  //       "http://localhost:3000/auth/logout",
-  //       {},
-  //       {
-  //         headers: { Authorization: `Bearer ${user?.token}` },
-  //       }
-  //     );
-  //     socket.emit("removeUser", user.id);
-  //     clearUser();
-  //   } catch (error) {
-  //     console.error("Erreur lors de la déconnexion :", error);
-  //   }
-  // };
 
-  // const handleDeleteAccount = async () => {
-  //   const confirmDelete = window.confirm(
-  //     "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible."
-  //   );
-  //   if (!confirmDelete) return;
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        "http://localhost:3000/auth/logout",
+        {},
+        {
+          headers: { Authorization: `Bearer ${user?.token}` },
+        }
+      );
+      socket.emit("removeUser", user.id);
+      clearUser(); // Réinitialiser l'utilisateur dans le contexte
+      navigate("/login"); // Rediriger vers la page de connexion
+    } catch (error) {
+      console.error("Erreur lors de la déconnexion :", error);
+    }
+  };
 
-  //   try {
-  //     await axios.delete(`http://localhost:3000/users/${user?.id}`, {
-  //       headers: {
-  //         Authorization: `Bearer ${user?.token}`,
-  //       },
-  //     });
-  //     handleLogout();
-  //   } catch (error) {
-  //     console.error("Erreur lors de la suppression du compte :", error);
-  //   }
-  // };
+  const handleDeleteAccount = async () => {
+    const confirmDelete = window.confirm(
+      "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible."
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:3000/users/${user?.id}`, {
+        headers: {
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
+      clearUser();
+      navigate("/login");
+    } catch (error) {
+      console.error("Erreur lors de la suppression du compte :", error);
+    }
+  };
 
   return (
     <div className="w-64 bg-gray-800 text-white p-4 flex flex-col">
@@ -106,8 +111,8 @@ const Sidebar = ({ onUserClick }) => {
           user={user}
           onClose={() => setIsDrawerOpen(false)}
           onUpdate={handleUpdateUser}
-          // onDeleteAccount={handleDeleteAccount}
-          // onLogout={handleLogout}
+          onDeleteAccount={handleDeleteAccount}
+          onLogout={handleLogout}
         />
       )}
 
@@ -128,7 +133,7 @@ const Sidebar = ({ onUserClick }) => {
             <div
               key={u.id}
               className={`flex items-center gap-2 cursor-pointer hover:bg-gray-500 rounded-lg p-2 ${
-                u.isActive ? "bg-gray-600" : ""
+                u.isActive ? "bg-gray-600" : "bg-gray-700"
               }`}
               onClick={() => onUserClick(u)}
             >

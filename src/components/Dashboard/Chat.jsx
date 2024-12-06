@@ -17,6 +17,7 @@ const Chat = () => {
 
   useEffect(() => {
     if (!selectedUser || !user) return;
+
     const fetchMessages = async () => {
       try {
         const response = await fetch(
@@ -40,60 +41,78 @@ const Chat = () => {
 
   useEffect(() => {
     if (!user || !selectedUser) return;
-  
-    socket.on("messageReceived", (message) => {
-      console.log("Message reçu :", message);
+
+    const handleMessageReceived = (message) => {
+
       if (
         (message.senderId === selectedUser.id && message.recipientId === user.id) ||
         (message.senderId === user.id && message.recipientId === selectedUser.id)
       ) {
-        setMessages((prev) => [...prev, message]);
+        setMessages((prev) => {
+          if (!prev.some((m) => m._id === message._id)) {
+            return [...prev, message];
+          }
+          return prev;
+        });
       }
-    });
-  
+    };
+
+    socket.on("messageReceived", handleMessageReceived);
+
     return () => {
-      socket.off("messageReceived");
+      socket.off("messageReceived", handleMessageReceived);
     };
   }, [user, selectedUser]);
-   
-   const handleSendMessage = (content) => {
+
+  useEffect(() => {
+    socket.on("connect", () => {
+    });
+
+    socket.on("disconnect", () => {
+      console.warn("WebSocket déconnecté.");
+    });
+
+    return () => {
+      socket.off("connect");
+      socket.off("disconnect");
+    };
+  }, []);
+
+  const handleSendMessage = async (content) => {
     if (!selectedUser || !user) return;
-  
+
     const messageData = {
       senderId: user.id,
       recipientId: selectedUser.id,
       content,
       createdAt: new Date().toISOString(),
     };
-  
-    setMessages((prev) => {
-      if (
-        !prev.some(
-          (msg) =>
-            msg.content === messageData.content &&
-            msg.senderId === messageData.senderId &&
-            msg.recipientId === messageData.recipientId
-        )
-      ) {
-        return [...prev, messageData];
+
+    setMessages((prev) => [...prev, messageData]);
+
+    try {
+      if (socket.connected) {
+        socket.emit("sendMessage", messageData);
+      } else {
+        console.error("WebSocket non connecté. Message non envoyé.");
       }
-      return prev;
-    });
-  
-    socket.emit("sendMessage", messageData);
-  
-    fetch("http://localhost:3000/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${user.token}`,
-      },
-      body: JSON.stringify(messageData),
-    }).catch((error) =>
-      console.error("Erreur lors de l'envoi du message au backend :", error)
-    );
+
+      const response = await fetch("http://localhost:3000/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+        body: JSON.stringify(messageData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erreur lors de l'envoi du message au backend.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du message :", error);
+    }
   };
-  
 
   return (
     <div className="flex h-screen">
@@ -103,7 +122,7 @@ const Chat = () => {
           <>
             <ChatHeader user={selectedUser} />
             <div className="flex-1 overflow-y-auto">
-              <MessageList messages={messages} user={selectedUser} />
+              <MessageList messages={messages} user={user} />
             </div>
             <MessageInput onSendMessage={handleSendMessage} />
           </>
