@@ -1,7 +1,3 @@
-Here’s a finalized `README.md` for your project, with the image placed in the `public` directory:
-
----
-
 # **React Chat Application**
 
 A real-time chat application built with **React**, **Socket.IO**, and a RESTful API backend. This project features an intuitive user interface, user session management, and real-time messaging.
