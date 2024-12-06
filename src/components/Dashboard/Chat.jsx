@@ -1,13 +1,15 @@
-import { useState, useEffect } from "react";
-import { io } from "socket.io-client";
-import { useUser } from "../../Context/UserContext";
-import Sidebar from "../ChatComponents/Sidebar";
-import ChatHeader from "../ChatComponents/ChatHeader";
-import MessageList from "../ChatComponents/MessageList";
-import MessageInput from "../ChatComponents/MessageInput";
+import { useState, useEffect } from 'react';
+import { io } from 'socket.io-client';
+import { useUser } from '../../Context/UserContext';
+import Sidebar from '../ChatComponents/Sidebar';
+import ChatHeader from '../ChatComponents/ChatHeader';
+import MessageList from '../ChatComponents/MessageList';
+import MessageInput from '../ChatComponents/MessageInput';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
-const socket = io("http://localhost:3000", {
-  query: { userId: localStorage.getItem("userId") },
+const socket = io(`${API_BASE_URL}`, {
+  query: { userId: localStorage.getItem('userId') },
 });
 
 const Chat = () => {
@@ -21,7 +23,7 @@ const Chat = () => {
     const fetchMessages = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/messages/${user.id}/${selectedUser.id}`,
+          `${API_BASE_URL}/messages/${user.id}/${selectedUser.id}`,
           {
             headers: { Authorization: `Bearer ${user.token}` },
           }
@@ -32,7 +34,7 @@ const Chat = () => {
         const data = await response.json();
         setMessages(data);
       } catch (error) {
-        console.error("Erreur lors de la récupération des messages :", error);
+        console.error('Erreur lors de la récupération des messages :', error);
       }
     };
 
@@ -43,10 +45,11 @@ const Chat = () => {
     if (!user || !selectedUser) return;
 
     const handleMessageReceived = (message) => {
-
       if (
-        (message.senderId === selectedUser.id && message.recipientId === user.id) ||
-        (message.senderId === user.id && message.recipientId === selectedUser.id)
+        (message.senderId === selectedUser.id &&
+          message.recipientId === user.id) ||
+        (message.senderId === user.id &&
+          message.recipientId === selectedUser.id)
       ) {
         setMessages((prev) => {
           if (!prev.some((m) => m._id === message._id)) {
@@ -57,24 +60,23 @@ const Chat = () => {
       }
     };
 
-    socket.on("messageReceived", handleMessageReceived);
+    socket.on('messageReceived', handleMessageReceived);
 
     return () => {
-      socket.off("messageReceived", handleMessageReceived);
+      socket.off('messageReceived', handleMessageReceived);
     };
   }, [user, selectedUser]);
 
   useEffect(() => {
-    socket.on("connect", () => {
-    });
+    socket.on('connect', () => {});
 
-    socket.on("disconnect", () => {
-      console.warn("WebSocket déconnecté.");
+    socket.on('disconnect', () => {
+      console.warn('WebSocket déconnecté.');
     });
 
     return () => {
-      socket.off("connect");
-      socket.off("disconnect");
+      socket.off('connect');
+      socket.off('disconnect');
     };
   }, []);
 
@@ -92,15 +94,15 @@ const Chat = () => {
 
     try {
       if (socket.connected) {
-        socket.emit("sendMessage", messageData);
+        socket.emit('sendMessage', messageData);
       } else {
-        console.error("WebSocket non connecté. Message non envoyé.");
+        console.error('WebSocket non connecté. Message non envoyé.');
       }
 
-      const response = await fetch("http://localhost:3000/messages", {
-        method: "POST",
+      const response = await fetch(`${API_BASE_URL}/messages`, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${user.token}`,
         },
         body: JSON.stringify(messageData),

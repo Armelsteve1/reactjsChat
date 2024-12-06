@@ -8,7 +8,9 @@ const ChatHeader = ({ user }) => {
       />
       <div>
         <h2 className="text-lg font-bold">{user.username}</h2>
-        <p className={`text-sm ${user.isActive ? 'text-green-500' : 'text-red-500'}`}>
+        <p
+          className={`text-sm ${user.isActive ? 'text-green-500' : 'text-red-500'}`}
+        >
           {user.isActive ? 'En ligne' : 'Déconnecté'}
         </p>
       </div>

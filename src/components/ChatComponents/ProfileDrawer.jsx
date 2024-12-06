@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const ProfileDrawer = ({
   user,
@@ -45,13 +45,15 @@ const ProfileDrawer = ({
 
         <div className="flex items-center mb-6">
           <img
-            src={photo || "/default-avatar.webp"}
+            src={photo || '/default-avatar.webp'}
             alt="User avatar"
             className="w-20 h-20 rounded-full border-2 border-green-500"
           />
           <div className="ml-4">
             <h2 className="text-sm font-bold text-gray-700">{username}</h2>
-            <p className="text-sm text-gray-500">{email || "Email non fourni"}</p>
+            <p className="text-sm text-gray-500">
+              {email || 'Email non fourni'}
+            </p>
           </div>
         </div>
 
@@ -90,10 +92,12 @@ const ProfileDrawer = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Email</label>
+              <label className="block text-sm font-medium text-gray-700">
+                Email
+              </label>
               <input
                 type="email"
-                value={email || ""}
+                value={email || ''}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900 sm:text-sm"
               />

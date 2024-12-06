@@ -19,15 +19,22 @@ const Login = () => {
       navigate('/dashboard');
     } catch (err) {
       console.error('Erreur lors de la connexion :', err);
-      setError(err.response?.data?.message || 'Une erreur est survenue. Veuillez réessayer.');
+      setError(
+        err.response?.data?.message ||
+          'Une erreur est survenue. Veuillez réessayer.'
+      );
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-400 via-teal-500 to-blue-600 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-gray-800">Bienvenue !</h2>
-        <p className="text-center text-gray-500 mt-2">Connectez-vous à votre compte</p>
+        <h2 className="text-3xl font-bold text-center text-gray-800">
+          Bienvenue !
+        </h2>
+        <p className="text-center text-gray-500 mt-2">
+          Connectez-vous à votre compte
+        </p>
 
         {error && (
           <div className="bg-red-100 text-red-700 border border-red-300 p-3 rounded-md mt-4 text-sm">
@@ -37,7 +44,10 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Adresse e-mail
             </label>
             <input
@@ -51,7 +61,10 @@ const Login = () => {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Mot de passe
             </label>
             <input

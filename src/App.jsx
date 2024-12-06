@@ -1,11 +1,16 @@
-import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./components/Auth/Login";
-import Register from "./components/Auth/Register";
-import Dashboard from "./components/Dashboard/Chat";
-import ProtectedRoute from "./components/utils/ProtectedRoute";
-import { useUser } from "./Context/UserContext";
-import "./index.css";
+import React from 'react';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from 'react-router-dom';
+import Login from './components/Auth/Login';
+import Register from './components/Auth/Register';
+import Dashboard from './components/Dashboard/Chat';
+import ProtectedRoute from './components/utils/ProtectedRoute';
+import { useUser } from './Context/UserContext';
+import './index.css';
 
 const App = () => {
   const { user } = useUser();
@@ -25,7 +30,9 @@ const App = () => {
         />
         <Route
           path="/"
-          element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />}
+          element={
+            user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />
+          }
         />
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

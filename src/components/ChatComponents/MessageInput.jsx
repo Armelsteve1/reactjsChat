@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 const MessageInput = ({ onSendMessage }) => {
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
 
   const handleSend = () => {
     if (!message.trim()) return;
     onSendMessage(message);
-    setMessage("");
+    setMessage('');
   };
 
   return (

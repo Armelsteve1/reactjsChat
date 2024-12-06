@@ -1,6 +1,6 @@
-import React, { useRef, useEffect, useState } from "react";
-import dayjs from "dayjs";
-import AuthService from "../../services/AuthService";
+import React, { useRef, useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import AuthService from '../../services/AuthService';
 
 const MessageList = ({ messages, user }) => {
   const messageEndRef = useRef(null);
@@ -14,7 +14,7 @@ const MessageList = ({ messages, user }) => {
           m.content === msg.content &&
           m.senderId === msg.senderId &&
           m.recipientId === msg.recipientId &&
-          dayjs(m.createdAt).isSame(msg.createdAt, "second")
+          dayjs(m.createdAt).isSame(msg.createdAt, 'second')
       )
     );
   });
@@ -23,18 +23,18 @@ const MessageList = ({ messages, user }) => {
     (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
   );
 
-  const formatDate = (date) => dayjs(date).format("DD MMM YYYY");
-  const formatTime = (date) => dayjs(date).format("HH:mm");
+  const formatDate = (date) => dayjs(date).format('DD MMM YYYY');
+  const formatTime = (date) => dayjs(date).format('HH:mm');
 
   useEffect(() => {
     if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
 
   useEffect(() => {
     const fetchUsernames = async () => {
-      const token = sessionStorage.getItem("token");
+      const token = sessionStorage.getItem('token');
       const uniqueSenderIds = [...new Set(messages.map((msg) => msg.senderId))];
 
       const newUsernames = {};
@@ -80,21 +80,21 @@ const MessageList = ({ messages, user }) => {
             )}
             <div
               className={`flex ${
-                msg.senderId === user.id ? "justify-end" : "justify-start"
+                msg.senderId === user.id ? 'justify-end' : 'justify-start'
               }`}
             >
               <div
                 className={`p-3 rounded-lg max-w-xs ${
                   msg.senderId === user.id
-                    ? "bg-blue-100 text-right"
-                    : "bg-green-100 text-left"
+                    ? 'bg-blue-100 text-right'
+                    : 'bg-green-100 text-left'
                 }`}
               >
                 <p>{msg.content}</p>
                 <div className="text-xs text-gray-500 mt-1">
-                  {formatTime(msg.createdAt)}{" "}
+                  {formatTime(msg.createdAt)}{' '}
                   <span className="font-semibold text-gray-700">
-                    {usernames[msg.senderId] || "Inconnu"}
+                    {usernames[msg.senderId] || 'Inconnu'}
                   </span>
                 </div>
               </div>

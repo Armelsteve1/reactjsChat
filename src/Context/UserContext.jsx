@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import AuthService from "../services/AuthService";
+import { createContext, useContext, useState, useEffect } from 'react';
+import AuthService from '../services/AuthService';
 
 const UserContext = createContext();
 
@@ -10,14 +10,17 @@ export const UserProvider = ({ children }) => {
   useEffect(() => {
     const initializeUser = async () => {
       try {
-        const token = sessionStorage.getItem("token");
+        const token = sessionStorage.getItem('token');
         if (token) {
-          const userId = sessionStorage.getItem("userId");
+          const userId = sessionStorage.getItem('userId');
           const userData = await AuthService.getUserById(userId, token); // Ajoutez cette méthode dans AuthService
           setUser({ ...userData, token });
         }
       } catch (error) {
-        console.error("Erreur lors de l'initialisation de l'utilisateur :", error);
+        console.error(
+          "Erreur lors de l'initialisation de l'utilisateur :",
+          error
+        );
       } finally {
         setLoading(false);
       }
@@ -27,8 +30,8 @@ export const UserProvider = ({ children }) => {
   }, []);
 
   const addUser = (newUser) => {
-    sessionStorage.setItem("token", newUser.token);
-    sessionStorage.setItem("userId", newUser.id);
+    sessionStorage.setItem('token', newUser.token);
+    sessionStorage.setItem('userId', newUser.id);
     setUser(newUser);
   };
 
@@ -38,7 +41,9 @@ export const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, setUser, addUser, clearUser, loading }}>
+    <UserContext.Provider
+      value={{ user, setUser, addUser, clearUser, loading }}
+    >
       {children}
     </UserContext.Provider>
   );

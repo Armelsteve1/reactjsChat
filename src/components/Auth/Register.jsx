@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 const Register = () => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -23,28 +24,37 @@ const Register = () => {
       setError(null);
       setSuccess(null);
 
-      const response = await axios.post('http://localhost:3000/auth/register', {
+      const response = await axios.post(`${API_BASE_URL}/auth/register`, {
         email,
         username,
         password,
       });
 
-      setSuccess('Compte créé avec succès ! Vous pouvez maintenant vous connecter.');
+      setSuccess(
+        'Compte créé avec succès ! Vous pouvez maintenant vous connecter.'
+      );
       setEmail('');
       setUsername('');
       setPassword('');
       setConfirmPassword('');
       navigate('/login');
     } catch (err) {
-      setError(err.response?.data?.message || 'Une erreur est survenue. Veuillez réessayer.');
+      setError(
+        err.response?.data?.message ||
+          'Une erreur est survenue. Veuillez réessayer.'
+      );
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-400 via-teal-500 to-blue-600 flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
-        <h2 className="text-3xl font-bold text-center text-gray-800">Créer un compte</h2>
-        <p className="text-center text-gray-500 mt-2">Inscrivez-vous pour commencer</p>
+        <h2 className="text-3xl font-bold text-center text-gray-800">
+          Créer un compte
+        </h2>
+        <p className="text-center text-gray-500 mt-2">
+          Inscrivez-vous pour commencer
+        </p>
 
         {error && (
           <div className="bg-red-100 text-red-700 border border-red-300 p-3 rounded-md mt-4 text-sm">

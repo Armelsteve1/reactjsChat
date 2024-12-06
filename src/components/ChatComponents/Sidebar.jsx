@@ -1,26 +1,28 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Importer useNavigate pour la navigation
-import { useUser } from "../../Context/UserContext";
-import ProfileDrawer from "./ProfileDrawer";
-import axios from "axios";
-import { io } from "socket.io-client";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../../Context/UserContext';
+import ProfileDrawer from './ProfileDrawer';
+import axios from 'axios';
+import { io } from 'socket.io-client';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
-const socket = io("http://localhost:3000");
-socket.on("connect_error", (error) => {
-  console.error("Erreur de connexion WebSocket :", error);
+const socket = io(`${API_BASE_URL}`);
+socket.on('connect_error', (error) => {
+  console.error('Erreur de connexion WebSocket :', error);
 });
 
 const Sidebar = ({ onUserClick }) => {
-  const { user, setUser, clearUser } = useUser(); // Ajouter clearUser si non inclus
-  const navigate = useNavigate(); // Utiliser pour rediriger
+  const { user, setUser, clearUser } = useUser();
+  const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/users", {
+        const response = await axios.get(`${API_BASE_URL}/users`, {
           headers: { Authorization: `Bearer ${user?.token}` },
         });
         const sortedUsers = response.data.sort((a, b) =>
@@ -28,7 +30,10 @@ const Sidebar = ({ onUserClick }) => {
         );
         setAllUsers(sortedUsers);
       } catch (error) {
-        console.error("Erreur lors de la récupération des utilisateurs :", error);
+        console.error(
+          'Erreur lors de la récupération des utilisateurs :',
+          error
+        );
       }
     };
     if (user) {
@@ -39,11 +44,12 @@ const Sidebar = ({ onUserClick }) => {
   const handleUpdateUser = async (updatedUser) => {
     try {
       const response = await axios.patch(
-        `http://localhost:3000/users/${user?.id}`,
+        `${API_BASE_URL}/users${user?.id}`,
         updatedUser,
         {
           headers: {
-            Authorization: `Bearer ${user?.token}` },
+            Authorization: `Bearer ${user?.token}`,
+          },
         }
       );
       const updatedData = response.data;
@@ -61,36 +67,36 @@ const Sidebar = ({ onUserClick }) => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        "http://localhost:3000/auth/logout",
+        `${API_BASE_URL}/auth/logout`,
         {},
         {
           headers: { Authorization: `Bearer ${user?.token}` },
         }
       );
-      socket.emit("removeUser", user.id);
-      clearUser(); // Réinitialiser l'utilisateur dans le contexte
-      navigate("/login"); // Rediriger vers la page de connexion
+      socket.emit('removeUser', user.id);
+      clearUser();
+      navigate('/login');
     } catch (error) {
-      console.error("Erreur lors de la déconnexion :", error);
+      console.error('Erreur lors de la déconnexion :', error);
     }
   };
 
   const handleDeleteAccount = async () => {
     const confirmDelete = window.confirm(
-      "Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible."
+      'Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.'
     );
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:3000/users/${user?.id}`, {
+      await axios.delete(`${API_BASE_URL}/users${user?.id}`, {
         headers: {
           Authorization: `Bearer ${user?.token}`,
         },
       });
       clearUser();
-      navigate("/login");
+      navigate('/login');
     } catch (error) {
-      console.error("Erreur lors de la suppression du compte :", error);
+      console.error('Erreur lors de la suppression du compte :', error);
     }
   };
 
@@ -98,7 +104,7 @@ const Sidebar = ({ onUserClick }) => {
     <div className="w-64 bg-gray-800 text-white p-4 flex flex-col">
       <div className="flex flex-col items-center mb-6">
         <img
-          src={user.photo || "/default-avatar.webp"}
+          src={user.photo || '/default-avatar.webp'}
           alt="Avatar"
           className="w-16 h-16 rounded-full mb-3 border-2 border-green-500 cursor-pointer"
           onClick={() => setIsDrawerOpen(true)}
@@ -133,19 +139,19 @@ const Sidebar = ({ onUserClick }) => {
             <div
               key={u.id}
               className={`flex items-center gap-2 cursor-pointer hover:bg-gray-500 rounded-lg p-2 ${
-                u.isActive ? "bg-gray-600" : "bg-gray-700"
+                u.isActive ? 'bg-gray-600' : 'bg-gray-700'
               }`}
               onClick={() => onUserClick(u)}
             >
               <img
-                src={u.photo || "/default-avatar.webp"}
+                src={u.photo || '/default-avatar.webp'}
                 alt="Avatar utilisateur"
                 className="w-10 h-10 rounded-full"
               />
               <div>
                 <p className="font-semibold">{u.username}</p>
                 <p className="text-sm text-gray-400">
-                  {u.isActive ? "En ligne" : "Hors ligne"}
+                  {u.isActive ? 'En ligne' : 'Hors ligne'}
                 </p>
               </div>
             </div>

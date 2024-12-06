@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000';
-
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 const AuthService = {
   login: async (email, password) => {
     try {
@@ -10,7 +10,14 @@ const AuthService = {
         password,
       });
 
-      const { token, userId, username, photo, email: userEmail, isActive } = response.data;
+      const {
+        token,
+        userId,
+        username,
+        photo,
+        email: userEmail,
+        isActive,
+      } = response.data;
 
       sessionStorage.setItem('token', token);
       sessionStorage.setItem('userId', userId.toString());
@@ -31,17 +38,21 @@ const AuthService = {
 
   logout: async () => {
     try {
-      const token = sessionStorage.getItem("token");
+      const token = sessionStorage.getItem('token');
       if (token) {
-        await axios.post(`${API_BASE_URL}/auth/logout`, {}, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        await axios.post(
+          `${API_BASE_URL}/auth/logout`,
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
       }
       sessionStorage.clear();
     } catch (error) {
-      console.error("Erreur lors de la déconnexion :", error);
+      console.error('Erreur lors de la déconnexion :', error);
       throw error;
     }
   },
@@ -52,7 +63,7 @@ const AuthService = {
       const userId = sessionStorage.getItem('userId');
 
       if (!token || !userId) {
-        console.warn("Token ou userId manquant dans le stockage.");
+        console.warn('Token ou userId manquant dans le stockage.');
         return null;
       }
 
@@ -63,7 +74,10 @@ const AuthService = {
       });
       return response.data;
     } catch (error) {
-      console.error('Erreur lors de la récupération des données utilisateur :', error);
+      console.error(
+        'Erreur lors de la récupération des données utilisateur :',
+        error
+      );
       return null;
     }
   },
